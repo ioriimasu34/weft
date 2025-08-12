@@ -20,7 +20,8 @@ cd runtime-ts && npm ci && npm run build && cd ..
 # 4) Lint manifests against a policy (sample policies arrive in Step 3)
 python3 tools/policy_linter.py --help
 
-# 5) Example manifests live in examples/manifests (wired up in Step 5)
+# 5) Run examples end-to-end
+make examples
 ```
 
 ## CLI (Step 2)

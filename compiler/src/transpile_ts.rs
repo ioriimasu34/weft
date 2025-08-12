@@ -12,18 +12,43 @@ pub fn emit_ts(m: &Module) -> String {
         out.push_str(&format!("\"{:?}\"", e));
     }
     out.push_str("] as const;\n");
+
     for it in &m.items {
         match it {
-            Item::Actor { name } => {
-                out.push_str(&format!("export class {} {{ /* body omitted */ }}\n", name));
-            }
-            Item::Func { name } => {
-                out.push_str(&format!(
-                    "export function {}(/* args */) {{ /* body omitted */ }}\n",
-                    name
-                ));
-            }
+            Item::Actor { name } => out.push_str(&format!("export class {} {{ }}\n", name)),
+            Item::Func { name } => out.push_str(&format!("export function {}() {{ }}\n", name)),
         }
     }
+
+    out.push_str(
+        r#"
+export type DemoCtx = {
+  caps: any; now: ()=>number; log: (...a:any[])=>void;
+};
+export type DemoOpts = { endpoints?: string[]; smv_sec?: number };
+
+export async function run(ctx: DemoCtx, opts: DemoOpts = {}) {
+  ctx.log(`[Weft] ${moduleName} — effects: ${effects.join(",")}`);
+  if (effects.includes("Serial" as any) && ctx.caps?.serial?.readLine) {
+    const line = await ctx.caps.serial.readLine();
+    ctx.log(`[Weft] serial.readLine -> ${String(line || "")}`);
+  }
+  if (effects.includes("Net" as any) && ctx.caps?.net?.get) {
+    const ep = (opts.endpoints && opts.endpoints[0]) || "https://collector.example/ping";
+    const res = await ctx.caps.net.get(ep);
+    ctx.log(`[Weft] net.get ${ep} -> ${res?.status ?? 200}`);
+  }
+  if (effects.includes("Now" as any)) {
+    ctx.log(`[Weft] now() -> ${ctx.now()}`);
+  }
+  if (moduleName.endsWith(".kpi")) {
+    const smv = Number(opts.smv_sec ?? 40);
+    const target = Math.floor((3600 / smv) * 0.85);
+    ctx.log(`[Weft] hourly_target(smv=${smv}) -> ${target}`);
+  }
+}
+"#,
+    );
+
     out
 }

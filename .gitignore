@@ -9,6 +9,7 @@ dist/
 build/
 coverage/
 *.tsbuildinfo
+runtime-ts/src/gen/
 
 # Env
 .env
