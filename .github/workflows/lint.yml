@@ -1,0 +1,14 @@
+name: CI - lint
+on: [push, pull_request]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo fmt -- --check
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - name: typecheck runtime-ts
+        working-directory: weft/runtime-ts
+        run: npm ci && npm run typecheck

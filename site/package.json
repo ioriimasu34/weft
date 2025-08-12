@@ -1,0 +1,16 @@
+{
+  "name": "@weft/site",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "echo 'no tests'"
+  },
+  "devDependencies": {
+    "vite": "^5.4.2",
+    "vue": "^3.4.38"
+  },
+  "dependencies": {}
+}
