@@ -1,0 +1,8 @@
+{
+  "name": "@weft/server",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "node index.js" },
+  "dependencies": { "express": "^4.19.2", "dotenv": "^16.4.5" }
+}

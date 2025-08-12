@@ -1,0 +1,9 @@
+module textile.ingest
+effects Serial, Net
+
+actor Ingest {
+  fn run() {
+    let line = serial.readLine();
+    net.emit("https://collector.example/v1/scan", line);
+  }
+}
