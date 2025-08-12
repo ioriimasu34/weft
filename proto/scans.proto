@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package weft;
+
+message Scan {
+  string id = 1;
+}
