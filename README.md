@@ -11,7 +11,7 @@
 git clone https://github.com/stitch-os/weft.git
 cd weft
 
-# 2) Build the compiler stub (real CLI arrives in Step 2)
+# 2) Build the compiler CLI
 cd compiler && cargo build && cd ..
 
 # 3) TypeScript runtime (Step 4 will flesh out actor kernel)
@@ -21,6 +21,22 @@ cd runtime-ts && npm ci && npm run build && cd ..
 python3 tools/policy_linter.py --help
 
 # 5) Example manifests live in examples/manifests (wired up in Step 5)
+```
+
+## CLI (Step 2)
+
+```bash
+cd compiler
+cargo build
+
+# Check: lex/parse/typecheck + effects graph
+./target/debug/weftc check ../examples/ingest.weft
+
+# Transpile to TS
+./target/debug/weftc transpile-ts ../examples/ingest.weft --out /tmp/ingest.ts
+
+# Stub build
+./target/debug/weftc build --target vm --out ../build
 ```
 
 Repository layout

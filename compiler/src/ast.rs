@@ -1,11 +1,24 @@
+use crate::effects::Effect;
+
 #[derive(Debug, Clone)]
-pub enum Expr {
-    Number(f64),
-    Ident(String),
+pub enum Item {
+    Actor { name: String },
+    Func { name: String },
 }
 
 #[derive(Debug, Clone)]
 pub struct Module {
     pub name: String,
-    pub items: Vec<String>, // placeholder for future AST items
+    pub effects: Vec<Effect>,
+    pub items: Vec<Item>,
+}
+
+impl Module {
+    pub fn new(name: String) -> Self {
+        Self {
+            name,
+            effects: vec![],
+            items: vec![],
+        }
+    }
 }
