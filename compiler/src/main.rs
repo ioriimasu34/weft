@@ -1,4 +1,15 @@
 use clap::{Parser, Subcommand};
+use std::fs;
+
+use anyhow::{Context, Result};
+
+mod ast;
+mod effects;
+mod ir;
+mod lexer;
+mod parser;
+mod transpile_ts;
+mod typer;
 
 #[derive(Parser)]
 #[command(name = "weftc", version, about = "Weft compiler CLI")]
@@ -19,6 +30,7 @@ enum Cmd {
     },
     /// (Step 2) Build to target: wasm|native|vm
     Build {
+        file: String,
         #[arg(long)]
         target: String,
         #[arg(long, default_value = "build/")]
@@ -26,16 +38,47 @@ enum Cmd {
     },
 }
 
-fn main() {
+fn main() -> Result<()> {
     let cli = Cli::parse();
     match cli.cmd {
         None => {
             println!("weftc v{}", env!("CARGO_PKG_VERSION"));
-            println!("Subcommands will be enabled in Step 2. Try: weftc --help");
+            println!("Try: weftc --help");
         }
-        Some(_) => {
-            eprintln!("Subcommands are coming in Step 2. For now, use --help.");
-            std::process::exit(2);
+        Some(Cmd::Check { file }) => {
+            let src = fs::read_to_string(&file)
+                .with_context(|| format!("failed to read {file}"))?;
+            let tokens = crate::lexer::lex(&src);
+            let module = crate::parser::parse(&tokens)
+                .map_err(anyhow::Error::msg)?;
+            crate::typer::typecheck(&module)
+                .map_err(anyhow::Error::msg)?;
+            println!("OK");
+        }
+        Some(Cmd::TranspileTs { file, out }) => {
+            let src = fs::read_to_string(&file)
+                .with_context(|| format!("failed to read {file}"))?;
+            let ts = crate::transpile_ts::transpile_ts(&src);
+            fs::write(&out, ts)
+                .with_context(|| format!("failed to write {out}"))?;
+            println!("wrote {out}");
+        }
+        Some(Cmd::Build { file, target, out }) => {
+            match target.as_str() {
+                "wasm" | "native" | "vm" => {}
+                _ => anyhow::bail!("unknown target '{target}'"),
+            }
+            let src = fs::read_to_string(&file)
+                .with_context(|| format!("failed to read {file}"))?;
+            let _module = crate::parser::parse(&crate::lexer::lex(&src))
+                .map_err(anyhow::Error::msg)?;
+            fs::create_dir_all(&out)
+                .with_context(|| format!("failed to create {out}"))?;
+            let out_file = std::path::Path::new(&out).join("artifact.txt");
+            fs::write(&out_file, format!("build artifact for target {target}"))
+                .with_context(|| format!("failed to write {}", out_file.display()))?;
+            println!("built {}", out_file.display());
         }
     }
+    Ok(())
 }
