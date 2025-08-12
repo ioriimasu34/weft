@@ -1,13 +1,13 @@
 # Rust
-/target/
+target/
 /**/*.rlib
 Cargo.lock
 
 # Node/TS/Vite
 node_modules/
-/dist/
-/build/
-/coverage/
+dist/
+build/
+coverage/
 *.tsbuildinfo
 
 # Env
