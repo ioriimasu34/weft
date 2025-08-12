@@ -12,9 +12,18 @@ enum Cmd {
     /// (Step 2) Check a .weft file (lex/parse/typecheck)
     Check { file: String },
     /// (Step 2) Transpile to TypeScript
-    TranspileTs { file: String, #[arg(long)] out: String },
+    TranspileTs {
+        file: String,
+        #[arg(long)]
+        out: String,
+    },
     /// (Step 2) Build to target: wasm|native|vm
-    Build { #[arg(long)] target: String, #[arg(long, default_value = "build/")] out: String },
+    Build {
+        #[arg(long)]
+        target: String,
+        #[arg(long, default_value = "build/")]
+        out: String,
+    },
 }
 
 fn main() {
