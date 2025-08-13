@@ -1,0 +1,4 @@
+{
+  "module": "textile.kpi",
+  "effects": ["Db", "Now"]
+}

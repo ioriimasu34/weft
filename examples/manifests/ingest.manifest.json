@@ -1,0 +1,5 @@
+{
+  "module": "textile.ingest",
+  "effects": ["Serial", "Net"],
+  "endpoints": ["https://collector.example/*"]
+}

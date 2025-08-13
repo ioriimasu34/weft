@@ -1,0 +1,13 @@
+module textile.kpi
+effects Db, Now
+
+fn hourly_target(smv_sec: number): number {
+  return floor((3600 / smv_sec) * 0.85); // 85% eff
+}
+
+actor LineKpi {
+  fn analyze() {
+    let now = now.now();
+    db.write("kpi", { ts: now, red_flags: [] });
+  }
+}
