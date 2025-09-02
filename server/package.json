@@ -1,26 +1,15 @@
 {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  "name": "weft-server",
-  "version": "0.1.0",
-  "scripts": {
-    "test": "echo \"No tests\"",
-    "start": "node index.js",
-    "dev": "node --watch index.js"
-  }
-=======
-=======
->>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
   "name": "@weft/server",
   "version": "0.0.1",
   "private": true,
   "type": "module",
-<<<<<<< HEAD
-  "scripts": { "start": "node index.js" },
-  "dependencies": { "express": "^4.19.2", "dotenv": "^16.4.5" }
->>>>>>> origin/pybde0-codex/create-top-level-repo-layout
-=======
-  "scripts": { "start": "node index.js", "test": "echo 'no tests'" },
-  "dependencies": { "express": "^4.19.2", "dotenv": "^16.4.5" }
->>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
+  "scripts": { 
+    "start": "node index.js", 
+    "test": "echo 'no tests'",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": { 
+    "express": "^4.19.2", 
+    "dotenv": "^16.4.5" 
+  }
 }
