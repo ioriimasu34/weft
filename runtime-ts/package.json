@@ -4,5 +4,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"No tests\""
+  },
+  "dependencies": {
+    "typescript": "^5.9.2"
   }
 }
