@@ -1,8 +1,11 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Threat Model
 
 This document describes potential threats and mitigations for the project.
 =======
+=======
+>>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
 # Threat Model (initial)
 
 ## Surfaces
@@ -16,4 +19,7 @@ This document describes potential threats and mitigations for the project.
 - Data safety: sample datasets use RLS (Row-Level Security) and tenant scoping.
 
 See `tools/policy_linter.py` and `docs/effects.md`.
+<<<<<<< HEAD
 >>>>>>> origin/pybde0-codex/create-top-level-repo-layout
+=======
+>>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout

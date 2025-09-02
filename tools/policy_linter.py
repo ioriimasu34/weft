@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 def main():
     print("policy linter stub")
 =======
+=======
+>>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
 import argparse, json, sys, re
 from fnmatch import fnmatch
 
@@ -84,7 +87,10 @@ def main():
             print(f"[OK]   {mf}")
 
     sys.exit(1 if had_err else 0)
+<<<<<<< HEAD
 >>>>>>> origin/pybde0-codex/create-top-level-repo-layout
+=======
+>>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
 
 if __name__ == "__main__":
     main()

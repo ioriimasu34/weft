@@ -1,20 +1,30 @@
 {
   "compilerOptions": {
 <<<<<<< HEAD
+<<<<<<< HEAD
     "target": "ES2019",
     "module": "ES2020",
     "strict": true,
     "outDir": "dist"
   }
 =======
+=======
+>>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
     "target": "ES2022",
     "module": "ES2022",
     "moduleResolution": "Bundler",
     "strict": true,
     "outDir": "dist",
     "rootDir": "src",
+<<<<<<< HEAD
     "skipLibCheck": true
   },
   "include": ["src"]
 >>>>>>> origin/pybde0-codex/create-top-level-repo-layout
+=======
+    "skipLibCheck": true,
+    "types": ["node"]
+  },
+  "include": ["src", "src/gen/**/*.ts"]
+>>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
 }

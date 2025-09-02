@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 def main():
     print("weft pack dev stub")
 =======
+=======
+>>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
 import argparse, json, hmac, hashlib, sys, time, base64
 
 WARN = "DEV PACKER: Uses HMAC instead of Ed25519. DO NOT USE IN PRODUCTION."
@@ -28,6 +31,10 @@ def main():
         "created_at": int(time.time()),
         "dev_warning": WARN,
         "manifest": manifest,
+<<<<<<< HEAD
+=======
+        # store payload as base64 to mirror production packing format
+>>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
         "payload_b64": base64.b64encode(payload).decode(),
         "sbom": sbom,
     }
@@ -38,7 +45,10 @@ def main():
     with open(args.out, "w", encoding="utf-8") as f: json.dump(out, f, indent=2)
     print(WARN)
     print(f"wrote {args.out}")
+<<<<<<< HEAD
 >>>>>>> origin/pybde0-codex/create-top-level-repo-layout
+=======
+>>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
 
 if __name__ == "__main__":
     main()

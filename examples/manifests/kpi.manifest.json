@@ -1,8 +1,13 @@
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
   "name": "kpi"
 =======
   "module": "textile.kpi",
   "effects": ["Db", "Now"]
 >>>>>>> origin/pybde0-codex/create-top-level-repo-layout
+=======
+  "module": "textile.kpi",
+  "effects": ["Db", "Now"]
+>>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
 }

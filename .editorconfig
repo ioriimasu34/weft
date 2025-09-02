@@ -2,6 +2,7 @@ root = true
 
 [*]
 <<<<<<< HEAD
+<<<<<<< HEAD
 charset = utf-8
 end_of_line = lf
 insert_final_newline = true
@@ -9,6 +10,8 @@ trim_trailing_whitespace = true
 indent_style = space
 indent_size = 2
 =======
+=======
+>>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
 end_of_line = lf
 insert_final_newline = true
 charset = utf-8
@@ -17,4 +20,7 @@ indent_size = 2
 
 [*.rs]
 indent_size = 4
+<<<<<<< HEAD
 >>>>>>> origin/pybde0-codex/create-top-level-repo-layout
+=======
+>>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout

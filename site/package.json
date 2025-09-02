@@ -1,23 +1,37 @@
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
   "name": "weft-site",
   "version": "0.1.0",
   "scripts": {
     "test": "echo \"No tests\""
   }
 =======
+=======
+>>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
   "name": "@weft/site",
   "private": true,
   "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
+<<<<<<< HEAD
     "build": "vite build"
   },
   "devDependencies": {
+=======
+    "build": "vite build",
+    "test": "echo 'no tests'"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.4",
+>>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
     "vite": "^5.4.2",
     "vue": "^3.4.38"
   },
   "dependencies": {}
+<<<<<<< HEAD
 >>>>>>> origin/pybde0-codex/create-top-level-repo-layout
+=======
+>>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
 }

@@ -1,11 +1,14 @@
 syntax = "proto3";
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 package weft;
 
 message Scan {
   string id = 1;
 =======
+=======
+>>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
 package weft;
 
 message Scan {
@@ -13,5 +16,8 @@ message Scan {
   string tag_id = 2;
   int64 ts_ms = 3;
   string source = 4; // e.g. "serial", "rfid"
+<<<<<<< HEAD
 >>>>>>> origin/pybde0-codex/create-top-level-repo-layout
+=======
+>>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
 }

@@ -1,6 +1,9 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 task kpi {}
 =======
+=======
+>>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
 module textile.kpi
 effects Db, Now
 
@@ -14,4 +17,7 @@ actor LineKpi {
     db.write("kpi", { ts: now, red_flags: [] });
   }
 }
+<<<<<<< HEAD
 >>>>>>> origin/pybde0-codex/create-top-level-repo-layout
+=======
+>>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout

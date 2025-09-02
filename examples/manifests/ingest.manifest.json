@@ -1,9 +1,15 @@
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
   "name": "ingest"
 =======
   "module": "textile.ingest",
   "effects": ["Serial", "Net"],
   "endpoints": ["https://collector.example/*"]
 >>>>>>> origin/pybde0-codex/create-top-level-repo-layout
+=======
+  "module": "textile.ingest",
+  "effects": ["Serial", "Net"],
+  "endpoints": ["https://collector.example/*"]
+>>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
 }
