@@ -1,11 +1,27 @@
+<<<<<<< HEAD
 name: Lint
 
 on: [push, pull_request]
 
+=======
+name: CI - lint
+on: [push, pull_request]
+>>>>>>> origin/pybde0-codex/create-top-level-repo-layout
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
+<<<<<<< HEAD
       - uses: actions/checkout@v3
       - name: Lint
         run: echo "lint"
+=======
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo fmt -- --check
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - name: typecheck runtime-ts
+        working-directory: weft/runtime-ts
+        run: npm ci && npm run typecheck
+>>>>>>> origin/pybde0-codex/create-top-level-repo-layout

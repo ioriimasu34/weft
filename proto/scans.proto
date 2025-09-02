@@ -1,7 +1,17 @@
 syntax = "proto3";
+<<<<<<< HEAD
 
 package weft;
 
 message Scan {
   string id = 1;
+=======
+package weft;
+
+message Scan {
+  string tenant_id = 1;
+  string tag_id = 2;
+  int64 ts_ms = 3;
+  string source = 4; // e.g. "serial", "rfid"
+>>>>>>> origin/pybde0-codex/create-top-level-repo-layout
 }

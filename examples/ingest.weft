@@ -1,1 +1,13 @@
+<<<<<<< HEAD
 task ingest {}
+=======
+module textile.ingest
+effects Serial, Net
+
+actor Ingest {
+  fn run() {
+    let line = serial.readLine();
+    net.emit("https://collector.example/v1/scan", line);
+  }
+}
+>>>>>>> origin/pybde0-codex/create-top-level-repo-layout

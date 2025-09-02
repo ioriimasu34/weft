@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "weft-runtime-ts",
   "version": "0.1.0",
   "type": "module",
@@ -10,5 +11,18 @@
   },
   "dependencies": {
     "typescript": "^5.9.2"
+=======
+  "name": "@weft/runtime-ts",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "echo \"(add eslint in Step 7)\" && exit 0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+>>>>>>> origin/pybde0-codex/create-top-level-repo-layout
   }
 }

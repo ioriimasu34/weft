@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 name: CI Runtime
 
 on: [push, pull_request]
@@ -9,3 +10,24 @@ jobs:
       - uses: actions/checkout@v3
       - name: Test
         run: npm test
+=======
+name: CI - runtime
+on: [push, pull_request]
+jobs:
+  node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - name: runtime-ts
+        working-directory: weft/runtime-ts
+        run: |
+          npm ci
+          npm run build
+      - name: site
+        working-directory: weft/site
+        run: |
+          npm ci
+          npm run build
+>>>>>>> origin/pybde0-codex/create-top-level-repo-layout
