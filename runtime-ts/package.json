@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "test": "echo \"No tests\""
+    "test": "echo \"No tests\"",
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
   },
   "dependencies": {
     "typescript": "^5.9.2"
