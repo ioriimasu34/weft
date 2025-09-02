@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-export function serialize() {
+export async function readLine() {
   return "serial";
-=======
-export async function readLine(): Promise<string> {
-  return "";
->>>>>>> origin/pybde0-codex/create-top-level-repo-layout
-=======
-export async function readLine(): Promise<string> {
-  return "";
->>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
 }

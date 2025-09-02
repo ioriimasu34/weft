@@ -1,12 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-export function run() {
-  console.log("runtime ts stub");
-}
-=======
-=======
 // Weft Runtime — actor kernel (Step 4)
->>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
 export type Effect = "Db" | "Net" | "Now" | "Kms" | "Serial";
 
 export interface CapabilityToken {
@@ -16,15 +8,6 @@ export interface CapabilityToken {
   devOnly?: boolean;
 }
 
-<<<<<<< HEAD
-export interface ActorContext {
-  cap: CapabilityToken;
-}
-
-export class ActorSystem {
-  constructor() {}
-  spawn<T extends object>(_actor: T) { return _actor; }
-=======
 export interface Message { type: string; payload?: unknown }
 
 const hasEffect = (cap: CapabilityToken, e: Effect) => cap.effects.includes(e);
@@ -125,7 +108,6 @@ export class ActorSystem {
   }
 
   stop(name: string) { this.actors.delete(name); }
->>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
 }
 
 export * as db from "./caps/db.js";
@@ -134,7 +116,3 @@ export * as now from "./caps/now.js";
 export * as kms from "./caps/kms.js";
 export * as serial from "./caps/serial.js";
 export * as verify from "./security/verify.js";
-<<<<<<< HEAD
->>>>>>> origin/pybde0-codex/create-top-level-repo-layout
-=======
->>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
