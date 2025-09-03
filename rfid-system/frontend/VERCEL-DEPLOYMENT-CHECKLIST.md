@@ -1,4 +1,4 @@
-# 🚀 Vercel Deployment Checklist
+# 🚀 Vercel Deployment Checklist (Hobby Plan Compatible)
 
 ## 📋 Pre-Deployment Checklist
 
@@ -22,10 +22,17 @@
 - [ ] No peer dependency conflicts
 - [ ] Package-lock.json is committed
 
+### ✅ Hobby Plan Compatibility
+- [ ] No multi-region configuration in `vercel.json`
+- [ ] Function usage optimized for 100GB-hours/month limit
+- [ ] Bandwidth usage optimized for 100GB/month limit
+- [ ] Build time optimized for 6,000 minutes/month limit
+
 ## 🚀 Deployment Steps
 
 ### 1. Vercel Account Setup
 - [ ] Create Vercel account at [vercel.com](https://vercel.com)
+- [ ] Verify you're on Hobby (Free) plan
 - [ ] Connect GitHub account
 - [ ] Install Vercel CLI: `npm i -g vercel`
 
@@ -76,11 +83,13 @@ NEXT_PUBLIC_ENABLE_PWA=false
 - [ ] Verify output directory: `.next`
 - [ ] Verify install command: `npm ci`
 - [ ] Set Node.js version to 18.x
+- [ ] Verify no multi-region configuration
 
-### 5. Domain Configuration
-- [ ] Set custom domain (optional): `rfid.stitchos.com`
+### 5. Domain Configuration (Hobby Plan: 1 domain limit)
+- [ ] Set custom domain: `rfid.stitchos.com` (only 1 domain allowed)
 - [ ] Configure DNS records
 - [ ] Verify SSL certificate is provisioned
+- [ ] Note: Additional domains require Pro plan upgrade
 
 ## 🔧 Post-Deployment Verification
 
@@ -106,15 +115,22 @@ NEXT_PUBLIC_ENABLE_PWA=false
 - [ ] CORS is configured correctly
 - [ ] API endpoints are protected
 
+### ✅ Hobby Plan Limits Check
+- [ ] Function usage within 100GB-hours/month
+- [ ] Bandwidth usage within 100GB/month
+- [ ] Build time within 6,000 minutes/month
+- [ ] Custom domains limited to 1
+
 ## 📊 Monitoring Setup
 
-### ✅ Vercel Analytics
+### ✅ Vercel Analytics (Hobby Plan)
 - [ ] Enable Vercel Analytics
-- [ ] Configure performance monitoring
+- [ ] Configure basic performance monitoring
 - [ ] Set up error tracking
 - [ ] Monitor Core Web Vitals
+- [ ] Note: Advanced analytics require Pro plan
 
-### ✅ External Monitoring
+### ✅ External Monitoring (Optional)
 - [ ] Set up Sentry for error tracking
 - [ ] Configure Google Analytics
 - [ ] Set up uptime monitoring
@@ -164,102 +180,124 @@ NEXT_PUBLIC_ENABLE_PWA=false
 # Check for unnecessary re-renders
 ```
 
-## 📚 Useful Commands
-
-### Local Development
+#### Hobby Plan Limit Issues
 ```bash
-# Install dependencies
-npm install
-
-# Run development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Run tests
-npm test
-
-# Type checking
-npm run typecheck
-
-# Linting
-npm run lint
+# Check function usage in Vercel dashboard
+# Monitor bandwidth consumption
+# Optimize build times
+# Consider Pro plan upgrade if needed
 ```
 
-### Vercel CLI
-```bash
-# Login to Vercel
-vercel login
+### Emergency Procedures
 
-# Deploy to preview
-vercel
+#### 1. Service Recovery
+```bash
+# Restart all services
+make restart
+
+# Restart specific service
+make restart-backend
+
+# Rollback to previous version
+make rollback
+```
+
+#### 2. Data Recovery
+```bash
+# Restore from backup
+make restore
+
+# Emergency database reset
+make db-emergency-reset
+
+# Data export
+make export-data
+```
+
+## 💡 Hobby Plan Optimization Tips
+
+### Resource Management
+1. **Optimize Build Time**
+   - Use `npm ci` instead of `npm install`
+   - Minimize dependencies
+   - Use Next.js built-in optimizations
+
+2. **Reduce Function Usage**
+   - Use static generation where possible
+   - Minimize API routes
+   - Cache expensive operations
+
+3. **Bandwidth Optimization**
+   - Compress images and assets
+   - Use CDN for static files
+   - Implement proper caching
+
+### Scaling Considerations
+- **Hobby Plan Limits**: 100GB-hours/month functions, 100GB/month bandwidth
+- **Monitor Usage**: Check Vercel dashboard regularly
+- **Upgrade Path**: Pro plan for higher limits
+
+## 📚 Additional Resources
+
+### Documentation
+- [API Documentation](http://localhost:8002/docs)
+- [System Architecture](ARCHITECTURE.md)
+- [API Reference](API_REFERENCE.md)
+- [User Manual](USER_MANUAL.md)
+
+### Support
+- **Technical Issues**: Create issue on GitHub
+- **Emergency**: Contact system administrator
+- **Documentation**: Check project wiki
+- **Training**: Schedule with development team
+
+### Maintenance Schedule
+- **Daily**: Health checks, log review
+- **Weekly**: Performance monitoring, backup verification
+- **Monthly**: Security updates, dependency updates
+- **Quarterly**: Full system audit, performance optimization
+
+---
+
+## 🎯 Quick Start Commands
+
+```bash
+# Complete setup
+make setup
+
+# Start development environment
+make dev
+
+# Deploy to staging
+make deploy-staging
 
 # Deploy to production
-vercel --prod
+make deploy-production
 
-# List deployments
-vercel ls
+# Monitor system
+make monitor
 
-# View logs
-vercel logs
-
-# Set environment variables
-vercel env add NEXT_PUBLIC_SUPABASE_URL
+# Get help
+make help
 ```
 
-### Performance Testing
-```bash
-# Run Lighthouse CI
-npm run lighthouse
+For detailed information about each command, run `make help` or check the [Makefile](Makefile).
 
-# Analyze bundle
-npm run analyze
+## 💰 Plan Upgrade Considerations
 
-# Run performance tests
-npm run perf-test
-```
+### When to Consider Pro Plan ($20/month)
+- **Function usage exceeds 100GB-hours/month**
+- **Bandwidth exceeds 100GB/month**
+- **Need multiple custom domains**
+- **Require advanced analytics**
+- **Need multi-region deployment**
 
-## 🎯 Success Criteria
-
-### ✅ Deployment Success
-- [ ] Application deploys without errors
-- [ ] All environment variables are loaded
-- [ ] Build artifacts are generated correctly
-- [ ] Domain is accessible
-
-### ✅ Functionality Success
-- [ ] All features work as expected
-- [ ] No JavaScript errors in console
-- [ ] API calls return correct responses
-- [ ] Real-time updates work
-
-### ✅ Performance Success
-- [ ] Page load time < 3 seconds
-- [ ] Lighthouse score > 80
-- [ ] Core Web Vitals are good
-- [ ] Bundle size is optimized
-
-### ✅ Security Success
-- [ ] HTTPS is enforced
-- [ ] Security headers are present
-- [ ] No sensitive data exposed
-- [ ] CORS is configured correctly
-
-## 🔄 Maintenance
-
-### ✅ Regular Tasks
-- [ ] Monitor Vercel Analytics
-- [ ] Check for dependency updates
-- [ ] Review performance metrics
-- [ ] Update environment variables as needed
-- [ ] Monitor error rates
-
-### ✅ Updates
-- [ ] Keep Next.js updated
-- [ ] Update dependencies regularly
-- [ ] Monitor security advisories
-- [ ] Test updates in staging first
+### Hobby Plan Benefits
+- **Free forever**
+- **Unlimited deployments**
+- **Global CDN included**
+- **SSL certificates included**
+- **Perfect for small to medium projects**
 
 ---
 
@@ -271,7 +309,15 @@ Once all items are checked, your StitchOS RFID Dashboard will be:
 - ✅ **Fully functional** with all features working
 - ✅ **Performance optimized** with good Core Web Vitals
 - ✅ **Secure** with proper headers and HTTPS
-- ✅ **Monitored** with analytics and error tracking
+- ✅ **Monitored** with basic Vercel Analytics
 - ✅ **Automatically deployed** on code changes
+- ✅ **Hobby plan compatible** with no multi-region restrictions
 
-**Your RFID system is now production-ready on Vercel!** 🚀
+**Your RFID system is now production-ready on Vercel Hobby plan!** 🚀
+
+### 💰 Cost-Effective Benefits
+
+- **Free hosting** with Vercel Hobby plan
+- **Auto-scaling** for traffic spikes
+- **Global CDN** for fast worldwide access
+- **Easy upgrade path** to Pro plan when needed

@@ -2,7 +2,7 @@
 
 ## 📋 Overview
 
-This guide covers deploying the StitchOS RFID Dashboard frontend to Vercel, including setup, configuration, and optimization for production use.
+This guide covers deploying the StitchOS RFID Dashboard frontend to Vercel, including setup, configuration, and optimization for production use. **Optimized for Vercel Hobby (Free) Plan.**
 
 ## 🎯 Quick Deploy
 
@@ -10,10 +10,34 @@ This guide covers deploying the StitchOS RFID Dashboard frontend to Vercel, incl
 
 ## 🔧 Prerequisites
 
-- [Vercel Account](https://vercel.com/signup)
+- [Vercel Account](https://vercel.com/signup) (Free Hobby plan supported)
 - [GitHub Account](https://github.com)
 - [Node.js 18+](https://nodejs.org/)
 - [npm or yarn](https://npmjs.com/)
+
+## 💰 Vercel Plan Considerations
+
+### Hobby Plan (Free) - ✅ Supported
+- **Serverless Functions**: 100GB-hours/month
+- **Bandwidth**: 100GB/month
+- **Build Time**: 6,000 minutes/month
+- **Deployments**: Unlimited
+- **Custom Domains**: 1 domain
+- **Regions**: Auto-selected (closest to users)
+
+### Pro Plan ($20/month) - 🚀 Enhanced
+- **Serverless Functions**: 1,000GB-hours/month
+- **Bandwidth**: 1TB/month
+- **Build Time**: 40,000 minutes/month
+- **Custom Domains**: Unlimited
+- **Regions**: Multi-region deployment
+- **Analytics**: Advanced metrics
+
+### Enterprise Plan - 🏢 Full Features
+- **Unlimited resources**
+- **Multi-region deployment**
+- **Advanced security features**
+- **Priority support**
 
 ## 🚀 Deployment Methods
 
@@ -116,6 +140,7 @@ The `vercel.json` file includes:
 - **Caching**: Static asset optimization
 - **Rewrites**: API and WebSocket proxying
 - **Function Configuration**: API route optimization
+- **Hobby Plan Compatible**: No multi-region restrictions
 
 ## 🔒 Security & Performance
 
@@ -174,14 +199,13 @@ npm test -- --watch
 
 ## 📊 Monitoring & Analytics
 
-### Vercel Analytics
+### Vercel Analytics (Hobby Plan)
 
-- **Performance Monitoring**: Core Web Vitals
+- **Basic Performance Monitoring**: Core Web Vitals
 - **Error Tracking**: JavaScript errors and exceptions
-- **User Analytics**: Page views and user behavior
-- **Real-time Metrics**: Live performance data
+- **Deployment History**: Build and deployment logs
 
-### Custom Monitoring
+### External Monitoring (Optional)
 
 ```bash
 # Health Check Endpoint
@@ -233,7 +257,7 @@ deploy:vercel:
 
 ## 🌐 Custom Domain
 
-### Add Custom Domain
+### Add Custom Domain (Hobby Plan: 1 domain)
 
 1. **Vercel Dashboard**
    - Go to Project Settings
@@ -244,18 +268,15 @@ deploy:vercel:
    ```bash
    # Add CNAME record
    CNAME: rfid.stitchos.com -> cname.vercel-dns.com
-   
-   # Or A record
-   A: rfid.stitchos.com -> 76.76.19.76
    ```
 
 3. **SSL Certificate**
    - Vercel automatically provisions SSL
-   - Supports HTTP/2 and HTTP/3
+   - Supports HTTP/2
 
 ## 📈 Performance Optimization
 
-### Core Web Vitals
+### Core Web Vitals Targets
 
 - **LCP (Largest Contentful Paint)**: < 2.5s
 - **FID (First Input Delay)**: < 100ms
@@ -314,6 +335,31 @@ VERCEL_DEBUG=1 vercel
 vercel logs
 ```
 
+## 💡 Hobby Plan Optimization Tips
+
+### Resource Management
+
+1. **Optimize Build Time**
+   - Use `npm ci` instead of `npm install`
+   - Minimize dependencies
+   - Use Next.js built-in optimizations
+
+2. **Reduce Function Usage**
+   - Use static generation where possible
+   - Minimize API routes
+   - Cache expensive operations
+
+3. **Bandwidth Optimization**
+   - Compress images and assets
+   - Use CDN for static files
+   - Implement proper caching
+
+### Scaling Considerations
+
+- **Hobby Plan Limits**: 100GB-hours/month functions, 100GB/month bandwidth
+- **Monitor Usage**: Check Vercel dashboard regularly
+- **Upgrade Path**: Pro plan for higher limits
+
 ## 📚 Additional Resources
 
 ### Documentation
@@ -340,7 +386,7 @@ vercel logs
 
 1. **Deploy to Vercel** using one of the methods above
 2. **Configure Environment Variables** in Vercel dashboard
-3. **Set up Custom Domain** if needed
+3. **Set up Custom Domain** (1 domain limit on Hobby plan)
 4. **Configure Backend API** endpoints
 5. **Test All Functionality** in production environment
 6. **Monitor Performance** using Vercel Analytics
@@ -350,13 +396,21 @@ vercel logs
 
 ## 🚀 Ready to Deploy?
 
-Your StitchOS RFID frontend is now fully optimized for Vercel deployment with:
+Your StitchOS RFID frontend is now fully optimized for Vercel Hobby plan deployment with:
 
+- ✅ **Hobby Plan Compatible** - No multi-region restrictions
 - ✅ **Performance Optimizations** - SWC, bundle splitting, caching
 - ✅ **Security Headers** - XSS protection, content security
 - ✅ **Testing Setup** - Jest configuration with coverage
 - ✅ **CI/CD Ready** - GitHub Actions and GitLab CI
-- ✅ **Monitoring** - Vercel Analytics integration
+- ✅ **Basic Monitoring** - Vercel Analytics integration
 - ✅ **PWA Support** - Offline functionality and app-like experience
 
 **Deploy now and start monitoring your RFID system in production!** 🎉
+
+### 💰 Cost-Effective Deployment
+
+- **Free Hobby Plan**: Perfect for development and small production deployments
+- **Auto-scaling**: Vercel automatically handles traffic spikes
+- **Global CDN**: Fast loading worldwide without multi-region costs
+- **Easy Upgrade**: Seamless transition to Pro plan when needed
