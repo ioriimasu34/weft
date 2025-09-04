@@ -1,0 +1,224 @@
+name: 🧪 E2E Tests
+
+on:
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  e2e-tests:
+    name: 🧪 E2E Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: apps/dashboard/package-lock.json
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: 📦 Install Dashboard Dependencies
+        run: |
+          cd apps/dashboard
+          npm ci
+
+      - name: 📦 Install Gateway Dependencies
+        run: |
+          cd apps/gateway
+          pip install -r requirements.txt
+
+      - name: 📦 Install Worker Dependencies
+        run: |
+          cd apps/ingest-worker
+          pip install -r requirements.txt
+
+      - name: 🗄️ Setup Test Database
+        run: |
+          # Start Supabase locally
+          npx supabase start
+          
+          # Run migrations
+          npx supabase db reset --local
+          
+          # Seed test data
+          npx supabase db seed --local
+
+      - name: 🚀 Start Services
+        run: |
+          # Start gateway
+          cd apps/gateway
+          python main.py &
+          GATEWAY_PID=$!
+          echo "GATEWAY_PID=$GATEWAY_PID" >> $GITHUB_ENV
+          
+          # Start worker
+          cd ../ingest-worker
+          python main.py &
+          WORKER_PID=$!
+          echo "WORKER_PID=$WORKER_PID" >> $GITHUB_ENV
+          
+          # Wait for services to start
+          sleep 10
+
+      - name: 🏗️ Build Dashboard
+        run: |
+          cd apps/dashboard
+          npm run build
+
+      - name: 🚀 Deploy Dashboard to Vercel Preview
+        run: |
+          cd apps/dashboard
+          npx vercel --token ${{ secrets.VERCEL_TOKEN }} --yes
+          echo "VERCEL_URL=$VERCEL_URL" >> $GITHUB_ENV
+
+      - name: 🧪 Install Playwright
+        run: |
+          cd apps/dashboard
+          npx playwright install --with-deps
+
+      - name: 🧪 Run E2E Tests
+        run: |
+          cd apps/dashboard
+          npm run e2e
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ env.VERCEL_URL }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          REDIS_URL: redis://localhost:6379
+
+      - name: 📊 Upload Test Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: apps/dashboard/playwright-report/
+          retention-days: 30
+
+      - name: 📊 Upload Test Videos
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: playwright-videos
+          path: apps/dashboard/test-results/
+          retention-days: 30
+
+      - name: 🧹 Cleanup
+        if: always()
+        run: |
+          # Stop services
+          kill $GATEWAY_PID || true
+          kill $WORKER_PID || true
+          
+          # Stop Supabase
+          npx supabase stop
+
+  # Load testing
+  load-tests:
+    name: 📊 Load Tests
+    runs-on: ubuntu-latest
+    needs: e2e-tests
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 📦 Install Load Testing Dependencies
+        run: |
+          pip install locust redis
+
+      - name: 🚀 Start Services
+        run: |
+          # Start Redis
+          docker run -d -p 6379:6379 redis:7-alpine
+          
+          # Start gateway (simplified for load testing)
+          cd apps/gateway
+          python -c "
+          import asyncio
+          from main import app
+          import uvicorn
+          uvicorn.run(app, host='0.0.0.0', port=8000)
+          " &
+          sleep 10
+
+      - name: 📊 Run Load Tests
+        run: |
+          cd scripts
+          locust -f load_test.py --host=http://localhost:8000 --users=100 --spawn-rate=10 --run-time=60s --headless
+
+      - name: 📊 Upload Load Test Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: load-test-results
+          path: scripts/locust-results/
+          retention-days: 30
+
+  # Performance testing
+  performance-tests:
+    name: ⚡ Performance Tests
+    runs-on: ubuntu-latest
+    needs: e2e-tests
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Install Lighthouse CI
+        run: npm install -g @lhci/cli@0.12.x
+
+      - name: 🚀 Deploy Dashboard to Vercel Preview
+        run: |
+          cd apps/dashboard
+          npx vercel --token ${{ secrets.VERCEL_TOKEN }} --yes
+          echo "VERCEL_URL=$VERCEL_URL" >> $GITHUB_ENV
+
+      - name: ⚡ Run Lighthouse CI
+        run: |
+          cd apps/dashboard
+          lhci autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: 📊 Upload Performance Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: lighthouse-results
+          path: apps/dashboard/.lighthouseci/
+          retention-days: 30

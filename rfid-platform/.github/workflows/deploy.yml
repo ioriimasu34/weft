@@ -1,0 +1,295 @@
+name: 🚀 Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+env:
+  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # Deploy Dashboard to Vercel
+  deploy-dashboard:
+    name: 🎨 Deploy Dashboard
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: apps/dashboard/package-lock.json
+
+      - name: 📦 Install Dependencies
+        run: |
+          cd apps/dashboard
+          npm ci
+
+      - name: 🏗️ Build Dashboard
+        run: |
+          cd apps/dashboard
+          npm run build
+
+      - name: 🚀 Deploy to Vercel
+        run: |
+          cd apps/dashboard
+          npx vercel --token ${{ secrets.VERCEL_TOKEN }} --prod
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: 📊 Get Deployment URL
+        id: deployment-url
+        run: |
+          cd apps/dashboard
+          DEPLOYMENT_URL=$(npx vercel ls --token ${{ secrets.VERCEL_TOKEN }} | head -n 2 | tail -n 1 | awk '{print $2}')
+          echo "url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
+
+      - name: 🧪 Test Deployment
+        run: |
+          echo "Testing deployment at ${{ steps.deployment-url.outputs.url }}"
+          curl -f "${{ steps.deployment-url.outputs.url }}" || exit 1
+
+      - name: 📝 Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `🚀 **Dashboard Deployed Successfully!**
+              
+              **Deployment URL:** ${{ steps.deployment-url.outputs.url }}
+              
+              **Environment:** ${{ github.event.inputs.environment || 'production' }}
+              
+              **Next Steps:**
+              1. Test the deployment URL
+              2. Verify all features are working
+              3. Check browser console for errors
+              4. Monitor application performance`
+            })
+
+  # Deploy Gateway to Fly.io
+  deploy-gateway:
+    name: 🚪 Deploy Gateway
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: apps/gateway/requirements.txt
+
+      - name: 📦 Install Dependencies
+        run: |
+          cd apps/gateway
+          pip install -r requirements.txt
+
+      - name: 🧪 Test Gateway
+        run: |
+          cd apps/gateway
+          pytest
+
+      - name: 🚀 Deploy to Fly.io
+        run: |
+          cd apps/gateway
+          flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: 📊 Get Gateway URL
+        id: gateway-url
+        run: |
+          cd apps/gateway
+          GATEWAY_URL=$(flyctl status --json | jq -r '.Hostname')
+          echo "url=https://$GATEWAY_URL" >> $GITHUB_OUTPUT
+
+      - name: 🧪 Test Gateway Health
+        run: |
+          echo "Testing gateway at ${{ steps.gateway-url.outputs.url }}/v1/health"
+          curl -f "${{ steps.gateway-url.outputs.url }}/v1/health" || exit 1
+
+  # Deploy Worker to Fly.io
+  deploy-worker:
+    name: ⚙️ Deploy Worker
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: apps/ingest-worker/requirements.txt
+
+      - name: 📦 Install Dependencies
+        run: |
+          cd apps/ingest-worker
+          pip install -r requirements.txt
+
+      - name: 🧪 Test Worker
+        run: |
+          cd apps/ingest-worker
+          pytest
+
+      - name: 🚀 Deploy to Fly.io
+        run: |
+          cd apps/ingest-worker
+          flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: 📊 Get Worker URL
+        id: worker-url
+        run: |
+          cd apps/ingest-worker
+          WORKER_URL=$(flyctl status --json | jq -r '.Hostname')
+          echo "url=https://$WORKER_URL" >> $GITHUB_OUTPUT
+
+  # Deploy Mobile App
+  deploy-mobile:
+    name: 📱 Deploy Mobile
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
+
+      - name: 📦 Install Dependencies
+        run: |
+          cd apps/mobile
+          flutter pub get
+
+      - name: 🧪 Test Mobile App
+        run: |
+          cd apps/mobile
+          flutter test
+
+      - name: 🏗️ Build APK
+        run: |
+          cd apps/mobile
+          flutter build apk --release
+
+      - name: 📊 Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: mobile-apk
+          path: apps/mobile/build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
+
+  # Database Migration
+  migrate-database:
+    name: 🗄️ Migrate Database
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 📦 Install Supabase CLI
+        run: pip install supabase
+
+      - name: 🗄️ Run Database Migrations
+        run: |
+          supabase db push --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: 🌱 Seed Database
+        if: github.event.inputs.environment == 'staging'
+        run: |
+          supabase db seed --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+  # Notify Deployment
+  notify-deployment:
+    name: 📢 Notify Deployment
+    runs-on: ubuntu-latest
+    needs: [deploy-dashboard, deploy-gateway, deploy-worker, migrate-database]
+    if: always()
+    
+    steps:
+      - name: 📢 Send Slack Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#deployments'
+          text: |
+            🚀 RFID Platform Deployment Complete
+            
+            **Environment:** ${{ github.event.inputs.environment || 'production' }}
+            **Branch:** ${{ github.ref_name }}
+            **Commit:** ${{ github.sha }}
+            
+            **Services:**
+            - Dashboard: ${{ needs.deploy-dashboard.result }}
+            - Gateway: ${{ needs.deploy-gateway.result }}
+            - Worker: ${{ needs.deploy-worker.result }}
+            - Database: ${{ needs.migrate-database.result }}
+            
+            **Dashboard URL:** ${{ needs.deploy-dashboard.outputs.url }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: 📧 Send Email Notification
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: 'RFID Platform Deployment Failed'
+          to: ${{ secrets.NOTIFICATION_EMAIL }}
+          from: 'RFID Platform <noreply@stitchos.com>'
+          body: |
+            RFID Platform deployment has failed.
+            
+            Environment: ${{ github.event.inputs.environment || 'production' }}
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            
+            Please check the GitHub Actions logs for more details.

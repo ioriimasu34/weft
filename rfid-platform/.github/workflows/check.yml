@@ -1,0 +1,235 @@
+name: 🔍 Check
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # Dashboard checks
+  dashboard-check:
+    name: 🎨 Dashboard Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./apps/dashboard
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: apps/dashboard/package-lock.json
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🔍 Type Check
+        run: npm run typecheck
+
+      - name: 🧹 Lint
+        run: npm run lint
+
+      - name: 🧪 Test
+        run: npm run test:ci
+
+      - name: 🏗️ Build
+        run: npm run build
+
+  # Gateway checks
+  gateway-check:
+    name: 🚪 Gateway Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./apps/gateway
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: apps/gateway/requirements.txt
+
+      - name: 📦 Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 🔍 Type Check
+        run: |
+          pip install mypy
+          mypy . --ignore-missing-imports
+
+      - name: 🧹 Lint
+        run: |
+          pip install flake8 black
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          black --check .
+
+      - name: 🧪 Test
+        run: |
+          pip install pytest pytest-cov
+          pytest --cov=. --cov-report=xml
+
+      - name: 📊 Upload Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          flags: gateway
+          name: gateway-coverage
+
+  # Ingest Worker checks
+  worker-check:
+    name: ⚙️ Worker Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./apps/ingest-worker
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: apps/ingest-worker/requirements.txt
+
+      - name: 📦 Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 🔍 Type Check
+        run: |
+          pip install mypy
+          mypy . --ignore-missing-imports
+
+      - name: 🧹 Lint
+        run: |
+          pip install flake8 black
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          black --check .
+
+      - name: 🧪 Test
+        run: |
+          pip install pytest pytest-cov
+          pytest --cov=. --cov-report=xml
+
+      - name: 📊 Upload Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          flags: worker
+          name: worker-coverage
+
+  # Shared package checks
+  shared-check:
+    name: 📦 Shared Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./packages/shared
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: packages/shared/package-lock.json
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🔍 Type Check
+        run: npm run typecheck
+
+      - name: 🧹 Lint
+        run: npm run lint
+
+      - name: 🧪 Test
+        run: npm run test:ci
+
+  # Security scan
+  security-scan:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔒 Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: 📊 Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: 🐍 Python Security Check
+        run: |
+          pip install safety bandit
+          find . -name "requirements.txt" -exec safety check -r {} \;
+          find . -name "*.py" -exec bandit {} \;
+
+      - name: 📦 Node.js Security Check
+        run: |
+          cd apps/dashboard
+          npm audit --audit-level=moderate
+          cd ../..
+          cd packages/shared
+          npm audit --audit-level=moderate
+
+  # Database schema check
+  db-check:
+    name: 🗄️ Database Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 📦 Install Supabase CLI
+        run: |
+          pip install supabase
+
+      - name: 🔍 Validate SQL Schema
+        run: |
+          # Check SQL syntax
+          find infra/supabase -name "*.sql" -exec psql --dry-run -f {} \;
+
+      - name: 🧪 Test RLS Policies
+        run: |
+          # Run RLS policy tests
+          python scripts/test-rls-policies.py
