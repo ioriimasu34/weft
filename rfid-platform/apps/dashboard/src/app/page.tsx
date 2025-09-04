@@ -3,17 +3,12 @@
 // StitchOS RFID Platform — Production Dashboard
 // Based on TextileTracker design with RFID-specific functionality
 
-/// <reference types="react" />
-/// <reference types="react-dom" />
-
-import React, { useEffect, useMemo, useState, type ReactNode } from "react";
+import React, { useEffect, useState, type ReactNode } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { motion } from "framer-motion";
 import {
   LineChart,
   Line,
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -21,20 +16,11 @@ import {
   ResponsiveContainer,
   ReferenceLine,
   Legend,
-  AreaChart,
-  Area,
-  PieChart,
-  Pie,
-  Cell,
 } from "recharts";
 import {
   Activity,
   GaugeCircle,
   Factory,
-  Users,
-  Bug,
-  Box,
-  Clock3,
   ChevronDown,
   Download,
   Settings,
@@ -43,11 +29,8 @@ import {
   Moon,
   Sun,
   Globe2,
-  Wifi,
-  WifiOff,
   Tag,
   Cpu,
-  AlertTriangle,
   CheckCircle,
   XCircle,
 } from "lucide-react";
@@ -66,12 +49,9 @@ const supabase = supabaseUrl && supabaseAnonKey
 function classNames(...a: Array<string | false | null | undefined>): string {
   return a.filter(Boolean).join(" ");
 }
-function format(n: number): string {
-  try { return new Intl.NumberFormat().format(n); } catch { return String(n); }
-}
 
 // Auth Guard
-function AuthGuard({ children }: { children: ReactNode }): JSX.Element {
+function AuthGuard({ children }: { children: ReactNode }): JSX.Element | null {
   const [loading, setLoading] = useState<boolean>(!!supabase);
   const [authed, setAuthed] = useState<boolean>(!supabase);
   const [error, setError] = useState<string | null>(null);
@@ -145,7 +125,6 @@ function RFIDDashboard(): JSX.Element {
   const [active, setActive] = useState<"live" | "assets" | "readers" | "analytics">("live");
   const [factory] = useState<string>("KTL Factory");
   const [dark, setDark] = useState<boolean>(false);
-  const [lang, setLang] = useState<"en" | "bn">("en");
   const [now, setNow] = useState<string>(new Date().toLocaleTimeString());
 
   useEffect(() => {
@@ -176,7 +155,7 @@ function RFIDDashboard(): JSX.Element {
               </div>
             </div>
             <div className="flex items-center gap-1">
-              <button aria-label="Toggle language" onClick={() => setLang((p: "en" | "bn") => (p === "en" ? "bn" : "en"))} className={classNames("rounded-xl border px-2 py-1 text-xs", dark ? "border-slate-700 bg-slate-900" : "border-emerald-200 bg-white")} title="Language">
+              <button aria-label="Toggle language" className={classNames("rounded-xl border px-2 py-1 text-xs", dark ? "border-slate-700 bg-slate-900" : "border-emerald-200 bg-white")} title="Language">
                 <Globe2 className="h-4 w-4" />
               </button>
               <button aria-label="Toggle theme" onClick={() => setDark((d: boolean) => !d)} className={classNames("rounded-xl border px-2 py-1 text-xs", dark ? "border-slate-700 bg-slate-900" : "border-emerald-200 bg-white")} title="Theme">
@@ -187,7 +166,12 @@ function RFIDDashboard(): JSX.Element {
 
           <nav className="mt-6 space-y-1">
             {TABS.map(t => (
-              <button key={t.key} onClick={() => setActive(t.key as any)} aria-pressed={active === t.key ? "true" : "false"} className={classNames("flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm transition", active === t.key ? (dark ? "bg-slate-800 text-white shadow" : "bg-emerald-600 text-white shadow") : (dark ? "hover:bg-slate-900" : "hover:bg-emerald-50"))}>
+              <button 
+                key={t.key} 
+                onClick={() => setActive(t.key)} 
+                aria-pressed={active === t.key} 
+                className={classNames("flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm transition", active === t.key ? (dark ? "bg-slate-800 text-white shadow" : "bg-emerald-600 text-white shadow") : (dark ? "hover:bg-slate-900" : "hover:bg-emerald-50"))}
+              >
                 {t.icon}
                 <span>{t.label}</span>
               </button>
