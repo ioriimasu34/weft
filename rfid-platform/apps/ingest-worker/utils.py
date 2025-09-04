@@ -9,8 +9,9 @@ from typing import Any, Dict
 
 def generate_idempotency_key(org_id: str, epc: str, reader_id: str, antenna: int, read_at: datetime) -> str:
     """Generate idempotency key for RFID reads"""
-    rounded_timestamp = int(read_at.timestamp())
-    hash_input = f"{org_id}{epc}{reader_id}{antenna}{rounded_timestamp}"
+    # Use microsecond precision for better uniqueness
+    timestamp_str = read_at.isoformat()
+    hash_input = f"{org_id}:{epc}:{reader_id}:{antenna}:{timestamp_str}"
     return hashlib.sha1(hash_input.encode('utf-8')).hexdigest()
 
 

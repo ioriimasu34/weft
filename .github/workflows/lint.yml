@@ -1,38 +1,50 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-name: Lint
+name: CI - Lint and Type Check
 
 on: [push, pull_request]
 
-=======
-name: CI - lint
-on: [push, pull_request]
->>>>>>> origin/pybde0-codex/create-top-level-repo-layout
-=======
-name: CI - lint
-on: [push, pull_request]
->>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-<<<<<<< HEAD
-<<<<<<< HEAD
-      - uses: actions/checkout@v3
-      - name: Lint
-        run: echo "lint"
-=======
-=======
->>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - run: cargo fmt -- --check
-      - uses: actions/setup-node@v4
-        with: { node-version: '20' }
-      - name: typecheck runtime-ts
-        working-directory: weft/runtime-ts
-        run: npm ci && npm run typecheck
-<<<<<<< HEAD
->>>>>>> origin/pybde0-codex/create-top-level-repo-layout
-=======
->>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd rfid-platform/apps/dashboard && npm ci
+          cd rfid-platform/apps/gateway && pip install -r requirements.txt
+          cd rfid-platform/apps/ingest-worker && pip install -r requirements.txt
+      
+      - name: Lint Dashboard
+        working-directory: rfid-platform/apps/dashboard
+        run: |
+          npm run lint
+          npm run typecheck
+      
+      - name: Lint Gateway
+        working-directory: rfid-platform/apps/gateway
+        run: |
+          python -m flake8 . --max-line-length=100
+          python -m black --check .
+      
+      - name: Lint Worker
+        working-directory: rfid-platform/apps/ingest-worker
+        run: |
+          python -m flake8 . --max-line-length=100
+          python -m black --check .
+      
+      - name: Lint Root
+        run: |
+          npm run lint
+          npm run typecheck
