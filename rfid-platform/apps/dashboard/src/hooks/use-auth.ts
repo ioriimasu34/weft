@@ -104,41 +104,6 @@ export function useAuth() {
     }
   }, [supabase.auth])
 
-  const signUp = useCallback(async (email: string, password: string, fullName?: string) => {
-    try {
-      setState(prev => ({ ...prev, loading: true, error: null }))
-      
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-          },
-        },
-      })
-
-      if (error) {
-        setState(prev => ({ ...prev, error: error.message, loading: false }))
-        toast.error(error.message)
-        return { success: false, error: error.message }
-      }
-
-      if (data.user && !data.session) {
-        toast.success('Please check your email to confirm your account')
-      } else {
-        toast.success('Account created successfully')
-      }
-      
-      return { success: true, data }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      setState(prev => ({ ...prev, error: errorMessage, loading: false }))
-      toast.error(errorMessage)
-      return { success: false, error: errorMessage }
-    }
-  }, [supabase.auth])
-
   const signOut = useCallback(async () => {
     try {
       setState(prev => ({ ...prev, loading: true }))
@@ -161,63 +126,12 @@ export function useAuth() {
     }
   }, [supabase.auth])
 
-  const resetPassword = useCallback(async (email: string) => {
-    try {
-      setState(prev => ({ ...prev, loading: true, error: null }))
-      
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`,
-      })
-
-      if (error) {
-        setState(prev => ({ ...prev, error: error.message, loading: false }))
-        toast.error(error.message)
-        return { success: false, error: error.message }
-      }
-
-      toast.success('Password reset email sent')
-      return { success: true }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      setState(prev => ({ ...prev, error: errorMessage, loading: false }))
-      toast.error(errorMessage)
-      return { success: false, error: errorMessage }
-    }
-  }, [supabase.auth])
-
-  const updateProfile = useCallback(async (updates: { full_name?: string; avatar_url?: string }) => {
-    try {
-      setState(prev => ({ ...prev, loading: true, error: null }))
-      
-      const { error } = await supabase.auth.updateUser({
-        data: updates,
-      })
-
-      if (error) {
-        setState(prev => ({ ...prev, error: error.message, loading: false }))
-        toast.error(error.message)
-        return { success: false, error: error.message }
-      }
-
-      toast.success('Profile updated successfully')
-      return { success: true }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      setState(prev => ({ ...prev, error: errorMessage, loading: false }))
-      toast.error(errorMessage)
-      return { success: false, error: errorMessage }
-    }
-  }, [supabase.auth])
-
   return {
     user: state.user,
     session: state.session,
     loading: state.loading,
     error: state.error,
     signIn,
-    signUp,
     signOut,
-    resetPassword,
-    updateProfile,
   }
 }

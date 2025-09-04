@@ -85,33 +85,6 @@ export function useRealtime() {
             }))
           }
         )
-        .on(
-          'postgres_changes',
-          {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'readers',
-            filter: `org_id=eq.${orgId}`,
-          },
-          (payload) => {
-            console.log('Reader status update:', payload)
-            
-            const message: RealtimeMessage = {
-              type: 'reader.status',
-              payload: payload.new,
-              timestamp: payload.new.updated_at,
-              org_id: payload.new.org_id,
-            }
-
-            setState(prev => ({
-              ...prev,
-              lastMessage: message,
-              messageCount: prev.messageCount + 1,
-              connected: true,
-              error: null,
-            }))
-          }
-        )
         .subscribe((status) => {
           console.log('Realtime subscription status:', status)
           
@@ -152,15 +125,6 @@ export function useRealtime() {
     setState(prev => ({ ...prev, connected: false }))
   }, [supabase])
 
-  const reconnect = useCallback(() => {
-    disconnect()
-    
-    // Reconnect after a delay
-    reconnectTimeoutRef.current = setTimeout(() => {
-      connect()
-    }, 5000)
-  }, [connect, disconnect])
-
   // Connect on mount and when user changes
   useEffect(() => {
     if (user) {
@@ -174,24 +138,6 @@ export function useRealtime() {
     }
   }, [user, connect, disconnect])
 
-  // Auto-reconnect on connection loss
-  useEffect(() => {
-    if (!state.connected && user && !state.error) {
-      const timeout = setTimeout(() => {
-        reconnect()
-      }, 10000) // Reconnect after 10 seconds
-
-      return () => clearTimeout(timeout)
-    }
-  }, [state.connected, state.error, user, reconnect])
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      disconnect()
-    }
-  }, [disconnect])
-
   return {
     connected: state.connected,
     lastMessage: state.lastMessage,
@@ -199,6 +145,5 @@ export function useRealtime() {
     messageCount: state.messageCount,
     connect,
     disconnect,
-    reconnect,
   }
 }
