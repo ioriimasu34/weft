@@ -13,6 +13,25 @@ RFID Readers → API Gateway → Message Bus → Workers → Database
   HTTP+HMAC    Auth/Rate    Streams    Workers   Postgres
 ```
 
+## 📸 Screenshots
+
+<p align="center">
+  <img src="public/RFID%20(1).png" alt="RFID Screenshot 1" width="600"/>
+</p>
+
+<p align="center">
+  <img src="public/RFID%20(2).png" alt="RFID Screenshot 2" width="600"/>
+</p>
+
+<p align="center">
+  <img src="public/RFID%20(3).png" alt="RFID Screenshot 3" width="600"/>
+</p>
+
+<p align="center">
+  <img src="public/RFID%20(4).png" alt="RFID Screenshot 4" width="600"/>
+</p>
+
+
 ## 🚀 Quick Start
 
 ```bash
