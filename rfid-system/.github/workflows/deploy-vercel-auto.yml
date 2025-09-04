@@ -1,0 +1,316 @@
+name: 🚀 Deploy to Vercel (Automated Environment Setup)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - preview
+
+env:
+  NODE_VERSION: '18'
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  test:
+    name: 🧪 Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: rfid-system/frontend/package-lock.json
+
+      - name: 📦 Install Dependencies
+        run: |
+          cd rfid-system/frontend
+          npm ci
+
+      - name: 🔍 Type Check
+        run: |
+          cd rfid-system/frontend
+          npm run typecheck
+
+      - name: 🧹 Lint
+        run: |
+          cd rfid-system/frontend
+          npm run lint
+
+      - name: 🧪 Test
+        run: |
+          cd rfid-system/frontend
+          npm test -- --coverage --watchAll=false
+
+      - name: 🏗️ Build
+        run: |
+          cd rfid-system/frontend
+          npm run build
+
+  deploy-production:
+    name: 🚀 Deploy to Production
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: rfid-system/frontend/package-lock.json
+
+      - name: 📦 Install Dependencies
+        run: |
+          cd rfid-system/frontend
+          npm ci
+
+      - name: 🚀 Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: 🔧 Setup Environment Variables
+        run: |
+          cd rfid-system/frontend
+          chmod +x scripts/setup-env-auto.sh
+          NEXT_PUBLIC_APP_NAME="StitchOS RFID" \
+          NEXT_PUBLIC_APP_VERSION="1.0.0" \
+          NEXT_PUBLIC_APP_ENV="production" \
+          NEXT_PUBLIC_API_BASE_URL="${{ secrets.NEXT_PUBLIC_API_BASE_URL }}" \
+          NEXT_PUBLIC_WS_URL="${{ secrets.NEXT_PUBLIC_WS_URL }}" \
+          NEXT_PUBLIC_SUPABASE_URL="${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" \
+          NEXT_PUBLIC_SUPABASE_ANON_KEY="${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" \
+          VERCEL_PROJECT_ID="${{ secrets.VERCEL_PROJECT_ID }}" \
+          VERCEL_ORG_ID="${{ secrets.VERCEL_ORG_ID }}" \
+          SET_PREVIEW_ENV="false" \
+          ./scripts/setup-env-auto.sh
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: 🚀 Deploy to Vercel
+        run: |
+          cd rfid-system/frontend
+          vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: 📊 Get Deployment URL
+        id: deployment-url
+        run: |
+          cd rfid-system/frontend
+          DEPLOYMENT_URL=$(vercel ls --limit 1 --token ${{ secrets.VERCEL_TOKEN }} | tail -n 1 | awk '{print $2}')
+          echo "url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: 🧪 Test Deployment
+        run: |
+          echo "Testing deployment at ${{ steps.deployment-url.outputs.url }}"
+          curl -f "${{ steps.deployment-url.outputs.url }}" || exit 1
+
+      - name: 📝 Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `🚀 **Production Deployment Complete!**
+              
+              **Deployment URL:** ${{ steps.deployment-url.outputs.url }}
+              
+              **Environment Variables Configured:**
+              - ✅ NEXT_PUBLIC_APP_NAME
+              - ✅ NEXT_PUBLIC_API_BASE_URL
+              - ✅ NEXT_PUBLIC_WS_URL
+              - ✅ NEXT_PUBLIC_SUPABASE_URL
+              - ✅ NEXT_PUBLIC_SUPABASE_ANON_KEY
+              
+              **Next Steps:**
+              1. Test the deployment URL
+              2. Verify all features are working
+              3. Check browser console for errors
+              4. Monitor application performance`
+            })
+
+  deploy-preview:
+    name: 🚀 Deploy to Preview
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'preview')
+    environment: preview
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: rfid-system/frontend/package-lock.json
+
+      - name: 📦 Install Dependencies
+        run: |
+          cd rfid-system/frontend
+          npm ci
+
+      - name: 🚀 Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: 🔧 Setup Environment Variables
+        run: |
+          cd rfid-system/frontend
+          chmod +x scripts/setup-env-auto.sh
+          NEXT_PUBLIC_APP_NAME="StitchOS RFID (Preview)" \
+          NEXT_PUBLIC_APP_VERSION="1.0.0" \
+          NEXT_PUBLIC_APP_ENV="preview" \
+          NEXT_PUBLIC_API_BASE_URL="${{ secrets.NEXT_PUBLIC_API_BASE_URL_PREVIEW || secrets.NEXT_PUBLIC_API_BASE_URL }}" \
+          NEXT_PUBLIC_WS_URL="${{ secrets.NEXT_PUBLIC_WS_URL_PREVIEW || secrets.NEXT_PUBLIC_WS_URL }}" \
+          NEXT_PUBLIC_SUPABASE_URL="${{ secrets.NEXT_PUBLIC_SUPABASE_URL_PREVIEW || secrets.NEXT_PUBLIC_SUPABASE_URL }}" \
+          NEXT_PUBLIC_SUPABASE_ANON_KEY="${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY_PREVIEW || secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" \
+          VERCEL_PROJECT_ID="${{ secrets.VERCEL_PROJECT_ID }}" \
+          VERCEL_ORG_ID="${{ secrets.VERCEL_ORG_ID }}" \
+          SET_PREVIEW_ENV="true" \
+          ./scripts/setup-env-auto.sh
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: 🚀 Deploy to Vercel (Preview)
+        run: |
+          cd rfid-system/frontend
+          vercel --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: 📊 Get Deployment URL
+        id: deployment-url
+        run: |
+          cd rfid-system/frontend
+          DEPLOYMENT_URL=$(vercel ls --limit 1 --token ${{ secrets.VERCEL_TOKEN }} | tail -n 1 | awk '{print $2}')
+          echo "url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: 🧪 Test Deployment
+        run: |
+          echo "Testing preview deployment at ${{ steps.deployment-url.outputs.url }}"
+          curl -f "${{ steps.deployment-url.outputs.url }}" || exit 1
+
+      - name: 📝 Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `🚀 **Preview Deployment Complete!**
+              
+              **Deployment URL:** ${{ steps.deployment-url.outputs.url }}
+              
+              **Environment Variables Configured:**
+              - ✅ NEXT_PUBLIC_APP_NAME (Preview)
+              - ✅ NEXT_PUBLIC_API_BASE_URL
+              - ✅ NEXT_PUBLIC_WS_URL
+              - ✅ NEXT_PUBLIC_SUPABASE_URL
+              - ✅ NEXT_PUBLIC_SUPABASE_ANON_KEY
+              
+              **Next Steps:**
+              1. Test the preview deployment
+              2. Verify all features are working
+              3. Check browser console for errors
+              4. Approve for production deployment`
+            })
+
+  lighthouse:
+    name: 📊 Lighthouse CI
+    runs-on: ubuntu-latest
+    needs: [deploy-production, deploy-preview]
+    if: always() && (needs.deploy-production.result == 'success' || needs.deploy-preview.result == 'success')
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: rfid-system/frontend/package-lock.json
+
+      - name: 📦 Install Dependencies
+        run: |
+          cd rfid-system/frontend
+          npm ci
+
+      - name: 🚀 Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: 📊 Get Deployment URL
+        id: deployment-url
+        run: |
+          cd rfid-system/frontend
+          DEPLOYMENT_URL=$(vercel ls --limit 1 --token ${{ secrets.VERCEL_TOKEN }} | tail -n 1 | awk '{print $2}')
+          echo "url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: 📊 Run Lighthouse CI
+        run: |
+          cd rfid-system/frontend
+          npm run lighthouse -- --url="${{ steps.deployment-url.outputs.url }}"
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+  security-scan:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: rfid-system/frontend/package-lock.json
+
+      - name: 📦 Install Dependencies
+        run: |
+          cd rfid-system/frontend
+          npm ci
+
+      - name: 🔒 Run Security Audit
+        run: |
+          cd rfid-system/frontend
+          npm audit --audit-level=moderate
+
+      - name: 🔒 Run Snyk Security Scan
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high

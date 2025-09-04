@@ -4,13 +4,30 @@
 
 A modern, responsive Next.js 14 dashboard for real-time RFID tracking in textile & apparel factories. Built with TypeScript, Tailwind CSS, and optimized for Vercel deployment.
 
-## 🚨 Important: Environment Variables Setup
+## 🚀 Automated Deployment (Recommended)
 
-**Before deploying, you MUST configure environment variables!** 
+**Deploy with one command - no manual configuration needed!**
 
-📖 **See [ENVIRONMENT-SETUP.md](./ENVIRONMENT-SETUP.md) for complete setup instructions.**
+```bash
+# One-command deployment (interactive)
+npm run deploy:now
 
-### Quick Setup:
+# One-command deployment (automated)
+NEXT_PUBLIC_API_BASE_URL="https://api.stitchos.com" \
+NEXT_PUBLIC_SUPABASE_URL="https://project.supabase.co" \
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your_key_here" \
+npm run deploy:now -- --auto
+```
+
+📖 **See [AUTOMATED-DEPLOYMENT.md](./AUTOMATED-DEPLOYMENT.md) for complete automated deployment guide.**
+
+## 🔧 Manual Environment Variables Setup (Alternative)
+
+**If you prefer manual setup:**
+
+📖 **See [ENVIRONMENT-SETUP.md](./ENVIRONMENT-SETUP.md) for manual setup instructions.**
+
+### Quick Manual Setup:
 1. Go to **Vercel Dashboard → Project Settings → Environment Variables**
 2. Add these required variables:
    - `NEXT_PUBLIC_APP_NAME` = "StitchOS RFID"
@@ -47,12 +64,18 @@ npm run dev
 ### Deploy to Vercel
 
 ```bash
-# Deploy using Vercel CLI
+# One-command deployment (recommended)
+npm run deploy:now
+
+# Interactive environment setup
+npm run deploy:interactive
+
+# Automated environment setup
+npm run deploy:auto
+
+# Traditional Vercel CLI deployment
 npm i -g vercel
 vercel --prod
-
-# Or use the automated script
-npm run deploy:vercel
 ```
 
 ## 🏗️ Architecture
@@ -213,7 +236,8 @@ Alternative CI/CD pipeline with:
 
 ## 📚 Documentation
 
-- **[ENVIRONMENT-SETUP.md](./ENVIRONMENT-SETUP.md)** - Environment variables configuration
+- **[AUTOMATED-DEPLOYMENT.md](./AUTOMATED-DEPLOYMENT.md)** - Automated deployment guide (recommended)
+- **[ENVIRONMENT-SETUP.md](./ENVIRONMENT-SETUP.md)** - Manual environment variables setup
 - **[README-VERCEL.md](./README-VERCEL.md)** - Vercel deployment guide
 - **[VERCEL-DEPLOYMENT-CHECKLIST.md](./VERCEL-DEPLOYMENT-CHECKLIST.md)** - Deployment checklist
 - **[API Documentation](http://localhost:8002/docs)** - Backend API reference
@@ -282,11 +306,10 @@ This project is licensed under the MIT License - see the [LICENSE](../LICENSE) f
 Your StitchOS RFID Dashboard is now ready for production deployment on Vercel!
 
 **Next Steps:**
-1. 📖 **Read [ENVIRONMENT-SETUP.md](./ENVIRONMENT-SETUP.md)**
-2. 🔧 **Configure environment variables in Vercel**
-3. 🚀 **Deploy to production**
-4. 🧪 **Test all functionality**
-5. 📊 **Monitor performance**
+1. 🚀 **Run `npm run deploy:now` for one-command deployment**
+2. 📖 **Or read [AUTOMATED-DEPLOYMENT.md](./AUTOMATED-DEPLOYMENT.md) for detailed guide**
+3. 🧪 **Test all functionality**
+4. 📊 **Monitor performance**
 
 **Need help?** Check the documentation or create an issue on GitHub.
 
