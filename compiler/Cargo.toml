@@ -1,14 +1,4 @@
 [package]
-<<<<<<< HEAD
-<<<<<<< HEAD
-name = "weft-compiler"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-=======
-=======
->>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
 name = "weftc"
 version = "0.0.1"
 edition = "2021"
@@ -28,16 +18,9 @@ serde_json = "1.0"
 [dev-dependencies]
 pretty_assertions = "1.4"
 
-<<<<<<< HEAD
-[[bin]]
-name = "weftc"
-path = "src/main.rs"
->>>>>>> origin/pybde0-codex/create-top-level-repo-layout
-=======
 [lib]
 path = "src/lib.rs"
 
 [[bin]]
 name = "weftc"
 path = "src/main.rs"
->>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout

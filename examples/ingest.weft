@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-task ingest {}
-=======
-=======
->>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
 module textile.ingest
 effects Serial, Net
 
@@ -13,7 +7,3 @@ actor Ingest {
     net.emit("https://collector.example/v1/scan", line);
   }
 }
-<<<<<<< HEAD
->>>>>>> origin/pybde0-codex/create-top-level-repo-layout
-=======
->>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout

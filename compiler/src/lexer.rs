@@ -1,22 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-pub fn lex(_input: &str) {}
-=======
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Token {
-    Ident(String),
-    Number(String),
-    LParen, RParen, LBrace, RBrace,
-    Arrow, Colon, Semicolon, Comma,
-    Eof,
-}
-
-pub fn lex(_src: &str) -> Vec<Token> {
-    // Minimal stub; real lexer lands in Step 2.
-    vec![Token::Eof]
-}
->>>>>>> origin/pybde0-codex/create-top-level-repo-layout
-=======
 #[derive(Debug, Clone, PartialEq)]
 pub enum TokKind {
     Ident(String),

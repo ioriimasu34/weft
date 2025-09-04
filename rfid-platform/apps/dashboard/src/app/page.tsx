@@ -3,6 +3,9 @@
 // StitchOS RFID Platform — Production Dashboard
 // Based on TextileTracker design with RFID-specific functionality
 
+/// <reference types="react" />
+/// <reference types="react-dom" />
+
 import React, { useEffect, useMemo, useState, type ReactNode } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { motion } from "framer-motion";
@@ -76,12 +79,12 @@ function AuthGuard({ children }: { children: ReactNode }): JSX.Element {
   useEffect(() => {
     if (!supabase) return;
     let mounted = true;
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(({ data }: { data: any }) => {
       if (!mounted) return;
       setAuthed(!!data.session);
       setLoading(false);
     });
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
       setAuthed(!!session);
     });
     return () => {
@@ -116,9 +119,9 @@ function AuthGuard({ children }: { children: ReactNode }): JSX.Element {
             </div>
           </div>
           <label className="mb-2 block text-sm text-slate-600">Email</label>
-          <input name="email" type="email" className="mb-3 w-full rounded-lg border border-emerald-200 p-2" required />
+          <input name="email" type="email" className="mb-3 w-full rounded-lg border border-emerald-200 p-2" placeholder="Enter your email" required />
           <label className="mb-2 block text-sm text-slate-600">Password</label>
-          <input name="password" type="password" className="mb-4 w-full rounded-lg border border-emerald-200 p-2" required />
+          <input name="password" type="password" className="mb-4 w-full rounded-lg border border-emerald-200 p-2" placeholder="Enter your password" required />
           {error && <div className="mb-3 text-sm text-rose-600">{error}</div>}
           <button type="submit" className="w-full rounded-xl bg-emerald-600 px-3 py-2 text-white">Continue</button>
           <p className="mt-3 text-center text-xs text-slate-500">Demo mode runs without auth if Supabase env vars are unset.</p>
@@ -173,10 +176,10 @@ function RFIDDashboard(): JSX.Element {
               </div>
             </div>
             <div className="flex items-center gap-1">
-              <button aria-label="Toggle language" onClick={() => setLang(p => (p === "en" ? "bn" : "en"))} className={classNames("rounded-xl border px-2 py-1 text-xs", dark ? "border-slate-700 bg-slate-900" : "border-emerald-200 bg-white")} title="Language">
+              <button aria-label="Toggle language" onClick={() => setLang((p: "en" | "bn") => (p === "en" ? "bn" : "en"))} className={classNames("rounded-xl border px-2 py-1 text-xs", dark ? "border-slate-700 bg-slate-900" : "border-emerald-200 bg-white")} title="Language">
                 <Globe2 className="h-4 w-4" />
               </button>
-              <button aria-label="Toggle theme" onClick={() => setDark(d => !d)} className={classNames("rounded-xl border px-2 py-1 text-xs", dark ? "border-slate-700 bg-slate-900" : "border-emerald-200 bg-white")} title="Theme">
+              <button aria-label="Toggle theme" onClick={() => setDark((d: boolean) => !d)} className={classNames("rounded-xl border px-2 py-1 text-xs", dark ? "border-slate-700 bg-slate-900" : "border-emerald-200 bg-white")} title="Theme">
                 {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </button>
             </div>
@@ -184,7 +187,7 @@ function RFIDDashboard(): JSX.Element {
 
           <nav className="mt-6 space-y-1">
             {TABS.map(t => (
-              <button key={t.key} onClick={() => setActive(t.key as any)} aria-pressed={active === t.key} className={classNames("flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm transition", active === t.key ? (dark ? "bg-slate-800 text-white shadow" : "bg-emerald-600 text-white shadow") : (dark ? "hover:bg-slate-900" : "hover:bg-emerald-50"))}>
+              <button key={t.key} onClick={() => setActive(t.key as any)} aria-pressed={active === t.key ? "true" : "false"} className={classNames("flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm transition", active === t.key ? (dark ? "bg-slate-800 text-white shadow" : "bg-emerald-600 text-white shadow") : (dark ? "hover:bg-slate-900" : "hover:bg-emerald-50"))}>
                 {t.icon}
                 <span>{t.label}</span>
               </button>
@@ -213,7 +216,7 @@ function RFIDDashboard(): JSX.Element {
             <div className="flex flex-wrap items-center gap-2">
               <div className={classNames("flex items-center gap-2 rounded-2xl border px-3 py-2 text-sm shadow-sm", dark ? "border-slate-700 bg-slate-900" : "border-emerald-200 bg-white")}> 
                 <span className="text-slate-600">Factory</span>
-                <button className={classNames("inline-flex items-center gap-1 rounded-xl px-2 py-1 text-white", dark ? "bg-slate-800" : "bg-emerald-600")} aria-haspopup="listbox" aria-expanded={false}>
+                <button className={classNames("inline-flex items-center gap-1 rounded-xl px-2 py-1 text-white", dark ? "bg-slate-800" : "bg-emerald-600")} aria-haspopup="listbox" aria-expanded="false">
                   {factory}
                   <ChevronDown className="h-3.5 w-3.5" />
                 </button>

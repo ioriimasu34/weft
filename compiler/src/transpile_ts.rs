@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-pub fn transpile_to_ts() {}
-=======
-pub fn transpile_ts(_src: &str) -> String {
-    "// TS output will be produced in Step 2\nexport default {};".to_string()
-}
->>>>>>> origin/pybde0-codex/create-top-level-repo-layout
-=======
 use crate::ast::{Item, Module};
 
 pub fn emit_ts(m: &Module) -> String {
@@ -61,4 +52,3 @@ export async function run(ctx: DemoCtx, opts: DemoOpts = {}) {
 
     out
 }
->>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout

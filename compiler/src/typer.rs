@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-pub fn type_check() {}
-=======
-pub fn typecheck() -> Result<(), String> {
-    Ok(())
-}
->>>>>>> origin/pybde0-codex/create-top-level-repo-layout
-=======
 use crate::ast::Module;
 use crate::effects::Effect;
 
@@ -30,4 +21,3 @@ pub fn typecheck(m: &Module) -> Result<(), TypeError> {
     }
     Ok(())
 }
->>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
