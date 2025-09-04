@@ -1,0 +1,41 @@
+{
+  "name": "rfid-platform",
+  "version": "1.0.0",
+  "description": "Enterprise-grade RFID tracking platform for textile & apparel factories",
+  "private": true,
+  "workspaces": [
+    "rfid-platform/apps/*",
+    "rfid-platform/packages/*"
+  ],
+  "scripts": {
+    "setup": "node rfid-platform/scripts/setup.js",
+    "dev": "concurrently \"pnpm --filter dashboard dev\" \"pnpm --filter gateway dev\" \"pnpm --filter ingest-worker dev\"",
+    "build": "pnpm --filter dashboard build && pnpm --filter gateway build && pnpm --filter ingest-worker build",
+    "start": "concurrently \"pnpm --filter dashboard start\" \"pnpm --filter gateway start\" \"pnpm --filter ingest-worker start\"",
+    "test": "pnpm --filter dashboard test && pnpm --filter gateway test && pnpm --filter ingest-worker test",
+    "test:integration": "pnpm --filter gateway test:integration",
+    "e2e": "pnpm --filter dashboard e2e",
+    "lint": "pnpm --filter dashboard lint && pnpm --filter gateway lint",
+    "typecheck": "pnpm --filter dashboard typecheck && pnpm --filter gateway typecheck",
+    "migrate": "cd rfid-platform && supabase db reset --local",
+    "seed": "cd rfid-platform && supabase db seed --local",
+    "verify": "pnpm typecheck && pnpm lint && pnpm test",
+    "deploy": "pnpm deploy:dashboard && pnpm deploy:gateway && pnpm deploy:worker",
+    "deploy:dashboard": "pnpm --filter dashboard deploy",
+    "deploy:gateway": "pnpm --filter gateway deploy",
+    "deploy:worker": "pnpm --filter ingest-worker deploy",
+    "deploy:mobile": "pnpm --filter mobile deploy",
+    "load-test": "pnpm --filter gateway load-test",
+    "clean": "pnpm --filter dashboard clean && pnpm --filter gateway clean && pnpm --filter ingest-worker clean"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0"
+}

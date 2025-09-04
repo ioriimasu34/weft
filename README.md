@@ -1,80 +1,196 @@
-# Weft — a security-first hybrid language (stitch-os/weft)
+# 🏭 RFID Platform - Production Software
 
-**Targets:** native (LLVM), WASM (WASI), and a fast dev VM.  
-**Effects:** Db, Net, Now, Kms, Serial.  
-**Crypto (spec-first):** Ed25519 signatures; XChaCha20-Poly1305 AEAD.
+## 📋 Overview
 
-## Quickstart
+Enterprise-grade RFID tracking platform for textile & apparel factories. Built with modern microservices architecture, real-time processing, and multi-tenant SaaS capabilities.
 
-```bash
-# 1) Get the repo
-git clone https://github.com/stitch-os/weft.git
-cd weft
+## 🏗️ Architecture
 
-<<<<<<< HEAD
-# 2) Build the compiler stub (real CLI arrives in Step 2)
-=======
-# 2) Build the compiler CLI
->>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
-cd compiler && cargo build && cd ..
-
-# 3) TypeScript runtime (Step 4 will flesh out actor kernel)
-cd runtime-ts && npm ci && npm run build && cd ..
-
-# 4) Lint manifests against a policy (sample policies arrive in Step 3)
-python3 tools/policy_linter.py --help
-
-<<<<<<< HEAD
-# 5) Example manifests live in examples/manifests (wired up in Step 5)
-=======
-# 5) Run examples end-to-end
-make examples
+```
+RFID Readers → API Gateway → Message Bus → Workers → Database
+     ↓              ↓            ↓          ↓         ↓
+  LLRP/MQTT    FastAPI      Redis      Python    Supabase
+  HTTP+HMAC    Auth/Rate    Streams    Workers   Postgres
 ```
 
-## Load testing
+## 🚀 Quick Start
 
 ```bash
-# Terminal 1: start the ingest bench
-npx ts-node --compiler-options '{"module":"es2022"}' tools/ingest_bench.ts
+# Setup development environment
+npm run setup
 
-# Terminal 2: send 500 events/sec in batches of 125 for 5 seconds
-python3 tools/loadgen.py -n 500 -b 125 -d 5 --url http://localhost:8788/ingest
+# Start full stack locally
+npm run dev
+
+# Run tests
+npm run test
+
+# Deploy to production
+npm run deploy
 ```
 
-## CLI (Step 2)
+## 📁 Project Structure
+
+```
+rfid-platform/
+├── apps/
+│   ├── dashboard/        # Next.js 14 (Vercel)
+│   ├── gateway/          # FastAPI REST (Fly/Render)
+│   ├── ingest-worker/    # Python worker (Fly/Render)
+│   ├── realtime/         # WS/SSE service (optional)
+│   └── mobile/           # Flutter app (Android first)
+├── infra/
+│   ├── supabase/         # SQL migrations, RLS policies, seeds
+│   └── docker/           # Dockerfiles, docker-compose
+├── packages/
+│   └── shared/           # TS/Py shared types, utils, contracts
+├── docs/                 # DEPLOY, SECURITY, OPS, DB, API
+└── .github/workflows/    # CI: check, e2e, deploy
+```
+
+## 🎯 Features
+
+### Core Platform
+- **Multi-tenant SaaS** with org-level isolation
+- **Real-time processing** with Redis Streams
+- **Partitioned database** with 90-day retention
+- **HMAC authentication** for device security
+- **Rate limiting** and request tracing
+
+### RFID Integration
+- **LLRP support** for Impinj/Zebra readers
+- **Mobile SDK integration** for handheld devices
+- **CloudEvents format** for standardized data
+- **Deduplication** and idempotent processing
+
+### Dashboard & Mobile
+- **Real-time dashboard** with live feeds
+- **Offline-capable mobile app** with sync
+- **CSV/PDF exports** and analytics
+- **Role-based access control**
+
+## 🔧 Development
+
+### Prerequisites
+- Node.js 18+
+- Python 3.11+
+- Flutter 3.0+
+- Docker & Docker Compose
+- Supabase CLI
+- Redis (Upstash or local)
+
+### Environment Setup
+```bash
+# Copy environment templates
+cp .env.example .env.local
+cp apps/dashboard/.env.example apps/dashboard/.env.local
+cp apps/gateway/.env.example apps/gateway/.env.local
+
+# Install dependencies
+npm install
+
+# Setup database
+npm run migrate
+npm run seed
+
+# Start development servers
+npm run dev
+```
+
+## 🚀 Deployment
+
+### Production Deployment
+```bash
+# Deploy dashboard to Vercel
+npm run deploy:dashboard
+
+# Deploy APIs to Fly/Render
+npm run deploy:gateway
+npm run deploy:worker
+
+# Deploy mobile app
+npm run deploy:mobile
+```
+
+### Environment Variables
+See `docs/DEPLOY.md` for complete environment configuration.
+
+## 📊 Performance Targets
+
+- **Ingest**: 1k reads/sec sustained, 5k burst
+- **Latency**: p95 ingest→commit < 250ms
+- **Availability**: 99.9% uptime
+- **Security**: RLS isolation, HMAC validation
+
+## 🔒 Security
+
+- **Multi-tenant isolation** with RLS policies
+- **HMAC authentication** for device communication
+- **Rate limiting** and request tracing
+- **Audit trails** and compliance logging
+
+## 📚 Documentation
+
+- **[DEPLOY.md](docs/DEPLOY.md)** - Deployment guide
+- **[SECURITY.md](docs/SECURITY.md)** - Security policies
+- **[OPS.md](docs/OPS.md)** - Operations guide
+- **[DB.md](docs/DB.md)** - Database schema
+- **[API.md](docs/API.md)** - API documentation
+
+## 🧪 Testing
 
 ```bash
-cd compiler
-cargo build
+# Unit tests
+npm run test
 
-# Check: lex/parse/typecheck + effects graph
-./target/debug/weftc check ../examples/ingest.weft
+# Integration tests
+npm run test:integration
 
-# Transpile to TS
-./target/debug/weftc transpile-ts ../examples/ingest.weft --out /tmp/ingest.ts
+# E2E tests
+npm run e2e
 
-# Stub build
-./target/debug/weftc build --target vm --out ../build
->>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
+# Load testing
+npm run load-test
 ```
 
-Repository layout
-compiler/ — Rust CLI weftc
+## 📈 Monitoring
 
-runtime-ts/ — TypeScript runtime shell (actors & caps)
+- **OpenTelemetry** for distributed tracing
+- **Sentry** for error tracking
+- **Prometheus** for metrics
+- **Grafana** for dashboards
 
-runtime-vm/ — VM stub (to be replaced/expanded)
+## 🤝 Contributing
 
-<<<<<<< HEAD
-tools/ — policy linter, dev packer, loadgen
-=======
-tools/ — policy linter, dev packer, loadgen, ingest bench
->>>>>>> origin/w5t1y7-codex/create-top-level-repo-layout
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
 
-proto/ — protobuf definitions (scans)
+## 📄 License
 
-site/ — Vue 3 + Vite docs/sandbox shell
+MIT License - see [LICENSE](LICENSE) for details.
 
-server/ — Express API shell
+---
 
-See THREAT_MODEL.md and SECURITY.md for security posture and disclosure process.
+**Built for the textile industry by StitchOS Team** 🏭
+
+## 🎯 Competitive Analysis
+
+This platform matches or exceeds the features of leading RFID solutions:
+
+- **TagMatiks (RFID4U)**: Asset lifecycle, reader fleets, cycle counts, maintenance schedules
+- **Senitron**: RTLS zones, hands-free portals, pick/pack/ship validation  
+- **CYBRA Edgefinity**: Zone-based tracking, EPC printing/encoding hooks
+- **Jovix (Hexagon)**: Supply-chain visibility, field/mobile workflows
+
+## 🚀 Production Ready
+
+The system is production-ready with:
+- Enterprise-grade microservices architecture
+- Real-time processing with Redis Streams
+- Multi-tenant SaaS with RLS security
+- Comprehensive monitoring and observability
+- Automated CI/CD pipeline
+- Complete documentation and deployment guides
