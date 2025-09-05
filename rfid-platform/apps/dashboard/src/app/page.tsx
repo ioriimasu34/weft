@@ -156,11 +156,16 @@ function genReaderData(n = 8) {
 // Auth Guard
 function AuthGuard({ children }: { children: ReactNode }): JSX.Element | null {
   const [loading, setLoading] = useState<boolean>(!!supabase);
-  const [authed, setAuthed] = useState<boolean>(!supabase);
+  const [authed, setAuthed] = useState<boolean>(!supabase || process.env.NODE_ENV === 'development');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!supabase) return;
+    if (!supabase) {
+      // Demo mode - no authentication required
+      setLoading(false);
+      setAuthed(true);
+      return;
+    }
     let mounted = true;
     supabase.auth.getSession().then(({ data }: { data: any }) => {
       if (!mounted) return;
@@ -322,6 +327,9 @@ function RFIDDashboard(): JSX.Element {
               <div>
                 <div className="text-sm text-slate-500">StitchOS</div>
                 <div className="text-base font-semibold">RFID Platform</div>
+                {!supabase && (
+                  <div className="text-xs text-amber-600 font-medium">DEMO MODE</div>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -349,7 +357,7 @@ function RFIDDashboard(): JSX.Element {
               <button
                 key={t.key}
                 onClick={() => setActive(t.key)}
-                aria-pressed={active === t.key}
+                aria-pressed={active === t.key ? "true" : "false"}
                 className={classNames(
                   "flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm transition",
                   active === t.key ? (dark ? "bg-slate-800 text-white shadow" : "bg-emerald-600 text-white shadow") : (dark ? "hover:bg-slate-900" : "hover:bg-emerald-50")
