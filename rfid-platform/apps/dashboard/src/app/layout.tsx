@@ -9,7 +9,6 @@ export const metadata: Metadata = {
   description: 'Enterprise-grade RFID tracking system for textile & apparel factories',
   keywords: ['RFID', 'tracking', 'textile', 'factory', 'manufacturing'],
   authors: [{ name: 'StitchOS Team' }],
-  viewport: 'width=device-width, initial-scale=1',
   robots: 'index, follow',
   openGraph: {
     title: 'RFID Platform Dashboard',
@@ -23,6 +22,11 @@ export const metadata: Metadata = {
     description: 'Real-time RFID tracking system for textile factories',
   },
   manifest: '/manifest.json',
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
   themeColor: '#1f2937',
 }
 
